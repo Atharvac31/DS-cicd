@@ -3,7 +3,6 @@ from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field
 import joblib
 import pandas as pd
-from typing import List
 
 # Initialize the FastAPI app
 app = FastAPI(
@@ -99,3 +98,4 @@ def predict(input_features: InputFeatures):
 # This block allows you to run the app directly with `python main.py` for local testing.
 if __name__ == '__main__':
     uvicorn.run(app, host="0.0.0.0", port=8000)
+

@@ -39,7 +39,7 @@ jobs:
 
       # Step 5: Debug - List files in workspace
       # We will list all files to see if the model is present and what its size is.
-      - name: Debug: List files in workspace
+      - name: Debug - List files in workspace
         run: ls -la
 
       # Step 6: Run the unit and integration tests with Pytest

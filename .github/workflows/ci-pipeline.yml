@@ -37,16 +37,16 @@ jobs:
       - name: Lint with Ruff
         run: ruff check .
 
-      # --- NEW DEBUGGING STEP ---
+      # Step 5: Debug - List files in workspace
       # We will list all files to see if the model is present and what its size is.
       - name: Debug: List files in workspace
         run: ls -la
 
-      # Step 5: Run the unit and integration tests with Pytest
+      # Step 6: Run the unit and integration tests with Pytest
       - name: Run tests with Pytest
         run: pytest
 
-      # Step 6: (Optional) Build a Docker image if tests pass
+      # Step 7: (Optional) Build a Docker image if tests pass
       # This step is commented out by default but can be enabled.
       # - name: Build Docker image
       #   run: docker build -t my-ml-api .

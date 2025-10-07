@@ -1,45 +1,35 @@
 name: CI Pipeline for ML Model
 
-# --- Trigger Conditions ---
 on:
   push:
     branches: [ main ]
   workflow_dispatch:
 
-# --- Job Definition ---
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
     steps:
-      # Step 1: Check out the repository's code
-      # The 'lfs: true' option is the critical fix.
-      # It tells the runner to download the full model file, not just a pointer.
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          lfs: true # <-- THIS IS THE FIX
+          lfs: true # <-- This is the most important line.
 
-      # Step 2: Set up a Python environment
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.9'
 
-      # Step 3: Install all required dependencies
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      # Step 4: Lint code with Ruff for style and errors
       - name: Lint with Ruff
         run: ruff check .
 
-      # Step 5: (Optional) Debug step to confirm file is now correct size
       - name: Debug - List workspace files
-        run: ls -la
+        run: ls -la # <-- We need the output from this step.
 
-      # Step 6: Run the unit and integration tests with Pytest
       - name: Run tests with Pytest
         run: pytest
 

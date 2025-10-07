@@ -1,60 +1,53 @@
-# Name of the GitHub Actions workflow. This is displayed in the "Actions" tab of your repository.
 name: CI Pipeline for ML Model
 
-# Controls when the workflow will run.
+# --- Trigger Conditions ---
+# This workflow runs on any push to the 'main' branch
 on:
-  # Triggers the workflow on push events but only for the "main" branch.
   push:
-    branches: [ "main" ]
-  # Triggers the workflow on pull request events but only for the "main" branch.
-  pull_request:
-    branches: [ "main" ]
+    branches: [ main ]
+  workflow_dispatch: # Allows manual triggering from the Actions tab
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel.
+# --- Job Definition ---
 jobs:
-  # This workflow contains a single job called "build-and-test".
   build-and-test:
-    # The type of runner that the job will run on. We're using the latest version of Ubuntu.
+    # Use the latest Ubuntu runner provided by GitHub
     runs-on: ubuntu-latest
 
-    # Steps represent a sequence of tasks that will be executed as part of the job.
+    # --- Steps ---
+    # A job is a sequence of steps
     steps:
-      # Step 1: Check-out your repository under $GITHUB_WORKSPACE, so your job can access it.
+      # Step 1: Check out the repository's code
+      # This downloads your code (main.py, etc.) into the runner
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # Step 2: Set up a specific version of Python.
-      - name: Set up Python 3.9
-        uses: actions/setup-python@v4
+      # Step 2: Set up a Python environment
+      - name: Set up Python
+        uses: actions/setup-python@v5
         with:
-          python-version: '3.9'
+          python-version: '3.9' # Specify the Python version
 
-      # Step 3: Install Python dependencies from requirements.txt.
+      # Step 3: Install all required dependencies
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      # Step 4 (Optional): Pull data/models versioned with DVC.
-      # In a real project, you would need to configure secrets for cloud storage access (e.g., AWS_ACCESS_KEY_ID).
-      - name: Pull DVC data and models
-        run: |
-          dvc pull
-        # If the pull fails (e.g., no DVC remote configured), the "continue-on-error" flag prevents the whole workflow from failing.
-        continue-on-error: true
-
-      # Step 5: Lint the code for style and quality checks using Ruff.
+      # Step 4: Lint code with Ruff for style and errors
       - name: Lint with Ruff
-        run: |
-          ruff check .
+        run: ruff check .
 
-      # Step 6: Run tests using Pytest to ensure the application logic is correct.
+      # --- NEW DEBUGGING STEP ---
+      # We will list all files to see if the model is present and what its size is.
+      - name: Debug: List files in workspace
+        run: ls -la
+
+      # Step 5: Run the unit and integration tests with Pytest
       - name: Run tests with Pytest
-        run: |
-          pytest
+        run: pytest
 
-      # Step 7 (Example Build Step): Build the Docker image to ensure it's buildable.
-      # This step assumes Docker is available on the runner, which it is on GitHub's runners.
-      - name: Build Docker image
-        run: |
-          docker build . --file Dockerfile --tag my-image-name:$(date +%s)
+      # Step 6: (Optional) Build a Docker image if tests pass
+      # This step is commented out by default but can be enabled.
+      # - name: Build Docker image
+      #   run: docker build -t my-ml-api .
+

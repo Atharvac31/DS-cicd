@@ -3,3 +3,6 @@ uvicorn[standard]
 scikit-learn
 pandas
 joblib
+ruff
+pytest
+dvc 

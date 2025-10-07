@@ -1,31 +1,29 @@
 name: CI Pipeline for ML Model
 
 # --- Trigger Conditions ---
-# This workflow runs on any push to the 'main' branch
 on:
   push:
     branches: [ main ]
-  workflow_dispatch: # Allows manual triggering from the Actions tab
+  workflow_dispatch:
 
 # --- Job Definition ---
 jobs:
   build-and-test:
-    # Use the latest Ubuntu runner provided by GitHub
     runs-on: ubuntu-latest
-
-    # --- Steps ---
-    # A job is a sequence of steps
     steps:
       # Step 1: Check out the repository's code
-      # This downloads your code (main.py, etc.) into the runner
+      # The 'lfs: true' option is the critical fix.
+      # It tells the runner to download the full model file, not just a pointer.
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          lfs: true # <-- THIS IS THE FIX
 
       # Step 2: Set up a Python environment
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.9' # Specify the Python version
+          python-version: '3.9'
 
       # Step 3: Install all required dependencies
       - name: Install dependencies
@@ -37,17 +35,11 @@ jobs:
       - name: Lint with Ruff
         run: ruff check .
 
-      # Step 5: Debug - List files in workspace
-      # We will list all files to see if the model is present and what its size is.
-      - name: Debug - List files in workspace
+      # Step 5: (Optional) Debug step to confirm file is now correct size
+      - name: Debug - List workspace files
         run: ls -la
 
       # Step 6: Run the unit and integration tests with Pytest
       - name: Run tests with Pytest
         run: pytest
-
-      # Step 7: (Optional) Build a Docker image if tests pass
-      # This step is commented out by default but can be enabled.
-      # - name: Build Docker image
-      #   run: docker build -t my-ml-api .
 
